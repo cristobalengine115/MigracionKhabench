@@ -1,0 +1,80 @@
+-- Conectar a la base de datos
+CONNECT remote:localhost/KhaBench root rootpwd;
+
+-- 📂 Cargar Person (ID → PERSON_ID)
+LOAD CSV FROM "file:/home/khabench/Desktop/test/Dataset/Customer/person_0_0.csv"
+WITH HEADERS
+FIELDS TERMINATED BY '|'
+SET PERSON_ID = ID,
+    FIRST_NAME = FIRSTNAME,
+    LAST_NAME = LASTNAME,
+    GENDER = GENDER,
+    BIRTHDAY = BIRTHDAY,
+    CREATE_DATE = CREATION_DATE,
+    LOCATION_IP = LOCATION_IP,
+    BROWSER_USED = BROWSER_USED,
+    PLACE = PLACE
+INSERT INTO Person;
+
+-- 📂 Cargar Customer (ID → CUSTOMER_ID)
+LOAD CSV FROM "file:/home/khabench/Desktop/test/Dataset/Customer/person_0_0.csv"
+WITH HEADERS
+FIELDS TERMINATED BY '|'
+SET CUSTOMER_ID = ID,
+    FIRST_NAME = FIRSTNAME,
+    LAST_NAME = LASTNAME,
+    GENDER = GENDER,
+    BIRTHDAY = BIRTHDAY,
+    CREATE_DATE = CREATION_DATE,
+    LOCATION_IP = LOCATION_IP,
+    BROWSER_USED = BROWSER_USED,
+    PLACE = PLACE
+INSERT INTO Customer;
+
+-- 📌 Fragmentar Customer_North
+LOAD CSV FROM "file:/home/khabench/Desktop/test/Dataset/Customer/person_0_0.csv"
+WITH HEADERS
+FIELDS TERMINATED BY '|'
+SET CUSTOMER_ID = ID,
+    FIRST_NAME = FIRSTNAME,
+    LAST_NAME = LASTNAME,
+    GENDER = GENDER,
+    BIRTHDAY = BIRTHDAY,
+    CREATE_DATE = CREATION_DATE,
+    LOCATION_IP = LOCATION_IP,
+    BROWSER_USED = BROWSER_USED,
+    PLACE = PLACE
+INSERT INTO Customer_North
+WHERE PLACE < 500;
+
+-- 📌 Fragmentar Customer_Center
+LOAD CSV FROM "file:/home/khabench/Desktop/test/Dataset/Customer/person_0_0.csv"
+WITH HEADERS
+FIELDS TERMINATED BY '|'
+SET CUSTOMER_ID = ID,
+    FIRST_NAME = FIRSTNAME,
+    LAST_NAME = LASTNAME,
+    GENDER = GENDER,
+    BIRTHDAY = BIRTHDAY,
+    CREATE_DATE = CREATION_DATE,
+    LOCATION_IP = LOCATION_IP,
+    BROWSER_USED = BROWSER_USED,
+    PLACE = PLACE
+INSERT INTO Customer_Center
+WHERE PLACE BETWEEN 500 AND 1000;
+
+-- 📌 Fragmentar Customer_South
+LOAD CSV FROM "file:/home/khabench/Desktop/test/Dataset/Customer/person_0_0.csv"
+WITH HEADERS
+FIELDS TERMINATED BY '|'
+SET CUSTOMER_ID = ID,
+    FIRST_NAME = FIRSTNAME,
+    LAST_NAME = LASTNAME,
+    GENDER = GENDER,
+    BIRTHDAY = BIRTHDAY,
+    CREATE_DATE = CREATION_DATE,
+    LOCATION_IP = LOCATION_IP,
+    BROWSER_USED = BROWSER_USED,
+    PLACE = PLACE
+INSERT INTO Customer_South
+WHERE PLACE > 1000;
