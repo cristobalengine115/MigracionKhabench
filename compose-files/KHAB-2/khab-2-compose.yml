@@ -1,0 +1,107 @@
+version: "3.9"
+
+services:
+  orientdb-node2:
+    image: orientdb:latest
+    environment:
+      - ORIENTDB_ROOT_PASSWORD=rootpwd
+      - ORIENTDB_NODE_NAME=orientdb-node2
+      - ORIENTDB_HOME=/orientdb
+    ports:
+      - "2425:2424"
+      - "2481:2480"
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == KHAB-2
+      resources:
+        limits:
+          memory: 4.0g
+          cpus: "1.5"
+    networks:
+      - khab-network
+
+  agent2:
+    image: arangodb:latest
+    environment:
+      - ARANGO_NO_AUTH=1
+    command:
+      - arangod
+      - --server.endpoint=tcp://0.0.0.0:5102
+      - --agency.my-address=tcp://agent2:5102
+      - --agency.activate=true
+      - --agency.size=3
+      - --agency.endpoint=tcp://agent1:5101
+      - --agency.endpoint=tcp://agent2:5102
+      - --agency.endpoint=tcp://agent3:5103
+      - --agency.supervision=true
+      - --database.directory=/var/lib/arangodb3/agent2
+    ports:
+      - "5102:5102"
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == KHAB-2
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.25"
+    networks:
+      - khab-network
+
+  dbserver2:
+    image: arangodb:latest
+    environment:
+      - ARANGO_NO_AUTH=1
+    command:
+      - arangod
+      - --server.endpoint=tcp://0.0.0.0:6102
+      - --cluster.my-address=tcp://dbserver2:6102
+      - --cluster.my-role=PRIMARY
+      - --cluster.agency-endpoint=tcp://agent1:5101
+      - --cluster.agency-endpoint=tcp://agent2:5102
+      - --cluster.agency-endpoint=tcp://agent3:5103
+      - --database.directory=/var/lib/arangodb3/dbserver2
+    ports:
+      - "6102:6102"
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == KHAB-2
+      resources:
+        limits:
+          memory: 1g
+          cpus: "0.5"
+    networks:
+      - khab-network
+
+  cratedb02:
+    image: crate:latest
+    ports:
+      - "4202:4200"
+    volumes:
+      - ./data/cratedb/02:/data
+    command: 
+      - crate
+      - -Ccluster.name=crate-docker-cluster
+      - -Cnode.name=cratedb02
+      - -Cnode.data=true
+      - -Cnetwork.host=_site_
+      - -Cdiscovery.seed_hosts=cratedb01,cratedb03
+      - -Ccluster.initial_master_nodes=cratedb01,cratedb02,cratedb03
+      - -Cgateway.expected_data_nodes=3
+      - -Cgateway.recover_after_data_nodes=2
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == KHAB-2
+      resources:
+        limits:
+          memory: 1g
+          cpus: "0.5"
+    networks:
+      - khab-network
+
+networks:
+  khab-network:
+    external: true
